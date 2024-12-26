@@ -1,0 +1,121 @@
+%-----------------------------------------------------------------------------%
+\chapter{\babSatu}
+%-----------------------------------------------------------------------------%
+% \todo{tambahkan kata-kata pengantar bab 1 disini}
+
+
+%-----------------------------------------------------------------------------%
+\section{Latar Belakang}
+%-----------------------------------------------------------------------------%
+\cc\ adalah sebuah sistem informasi yang menyediakan akses mudah ke berbagai komponen sumber daya, seperti server, aplikasi, dan database, melalui jaringan internet. Dalam sistem ini, sumber daya disimpan dan dikelola di pusat data yang terhubung dengan internet. \cc\ memiliki beberapa karakteristik utama, yakni layanan \f{on-demand}, akses jaringan yang luas, elastisitas yang cepat, dan layanan yang terukur. Terdapat tiga model layanan pada \cc, yaitu \f{Software as a Service} (SaaS), \f{Platform as a Service} (PaaS), dan Infrastructure as a Service (IaaS). Dan juga terdapat empat model implementasi pada \cc, yaitu \f{private cloud, community cloud, public cloud,} dan \f{hybrid cloud,} masing-masing sesuai dengan kebutuhan dan kegunaan dari pengguna yang berbeda \cite{mell2009nist}.
+
+Pengguna dapat membuat sistem \cc nya sendiri dengan menggunakan \f{Cloud Management Platform} Apache CloudStack. Apache CloudStack adalah perangkat lunak \oss\ yang dirancang untuk implementasi dan administrasi jaringan \vm. CloudStack berfungsi sebagai platform \cc\ Infrastructure as a Service (IaaS) yang \f{reliable}, Apache CloudStack juga dikenal karena kemampuan \f{high availability} dan skalabilitasnya. Apache CloudStack digunakan oleh berbagai penyedia layanan cloud untuk menyediakan layanan cloud publik, CloudStack juga digunakan oleh banyak perusahaan untuk membentuk solusi \f{private cloud} atau sebagai bagian dari konfigurasi \f{hybrid cloud} \cite{cloudstackabout}.
+
+Untuk menjalankan Apache Cloudstack diperlukan sebuah hypervisor. Hypervisor atau biasa juga dikenal sebagai \f{Virtual Machine Monitor} adalah komponen virtualisasi yang mengawasi dan mengelola sistem operasi \f{guest} pada sistem \f{host} \cite{scarfone2009nist}. Hypervisor mengontrol komunikasi instruksi antara sistem operasi \f{guest} dan \f{hardware} dari \f{host} \cite{scarfone2009nist}.
+
+Penggunaan KVM sebagai hypervisor untuk menjalankan \vm\ pada Apache Cloudstack telah menjadi praktik umum. Hypervisor KVM \f{(Kernel-based Virtual Machine)} adalah sebuah hypervisor berbasis kernel yang memungkinkan virtualisasi pada sistem operasi Linux \cite{whatiskvm}. KVM memanfaatkan modul kernel untuk menyediakan dukungan langsung untuk virtualisasi dengan menggunakan instruksi \f{hardware} yang mendukung teknologi virtualisasi, seperti Intel VT atau AMD-V. Namun, pertanyaan mendasar muncul: apakah hypervisor ini telah dikonfigurasi secara optimal untuk menjalankan \vm\ dan mengerjakan tugas yang diberikan dengan baik? Penelitian ini bertujuan untuk menganalisis apakah konfigurasi hypervisor KVM telah diatur dengan tepat dan baik. Pada penelitian ini, \saya\ akan menguji performa hypervisor dengan melakukan beberapa tugas komputasi, seperti kompresi video \cite{Folgar2014eg}, enkripsi, dekripsi, dan juga validasi integritas data. Selanjutnya, waktu yang diperlukan untuk menyelesaikan proses komputasi ini akan diukur dan dibandingkan dalam rangka evaluasi performa.
+
+
+%-----------------------------------------------------------------------------%
+\section{Permasalahan}
+%-----------------------------------------------------------------------------%
+Pada bagian ini akan dijelaskan mengenai definisi permasalahan yang \saya\ hadapi dan ingin diselesaikan serta asumsi dan batasan yang digunakan dalam menyelesaikannya.
+
+%-----------------------------------------------------------------------------%
+\subsection{Definisi Permasalahan}
+%-----------------------------------------------------------------------------%
+Berdasarkan latar belakang yang telah dijelaskan pada bab 1.1, bahasan definisi permasalahan yang akan dibahas pada penelitian ini adalah sebagai berikut:
+\begin{enumerate}
+      \item Apakah konfigurasi default dari Hypervisor KVM sudah dibuat dengan optimal?
+      \item Apakah konfigurasi Hypervisor KVM untuk \vm\ di Apache Cloudstack memberikan efek yang signifikan terhadap performa tugas komputasi seperti kompresi video, enkripsi dan dekripsi AES, dan validasi integritas data dengan CRC32?
+      \item Bagaimana konfigurasi Hypervisor KVM dapat diatur secara optimal untuk meningkatkan efisiensi atau kecepatan dalam menangani tugas komputasi tertentu pada Apache CloudStack?
+\end{enumerate}
+
+%-----------------------------------------------------------------------------%
+\subsection{Batasan Permasalahan}
+%-----------------------------------------------------------------------------%
+Karena berbagai kendala yang dihadapi pada skripsi ini dilakukan pembatasan masalah pada penelitian  sebagai berikut:
+\begin{enumerate}
+      \item Penelitian dilakukan menggunakan perangkat laptop dengan spesifikasi sebagai berikut:
+            \begin{itemize}
+                  \item CPU: AMD Ryzen 7 4800H x64.
+                  \item RAM: 16 GB.
+                  \item Penyimpanan: 1TB pada SSD.
+            \end{itemize}
+      \item Sistem operasi yang digunakan adalah Ubuntu Server 22.04 LTS.
+      \item Karena perangkat menggunakan CPU AMD, implementasi teknologi virtualisasi yang diadopsi adalah AMD-V.
+      \item Parameter yang menjadi fokus analisis dalam penelitian ini adalah waktu kompresi video, waktu enkrispsi dan dekripsi dengan AES, dan waktu validasi integritas data dengan CRC32 antara hypervisor default dan hypervisor yang telah dikonfigurasikan.
+\end{enumerate}
+
+
+%-----------------------------------------------------------------------------%
+\section{Tujuan}
+%-----------------------------------------------------------------------------%
+Penelitian ini berfokus pada analisis performa dari konfigurasi Hypervirsor KVM dengan menggunkaan CloudStack Agent pada \f{Cloud Management Platform} Apache CloudStack. Dengan tujuan sebagai berikut:
+
+\begin{enumerate}
+      \item  Memahami efek dari konfigurasi hypervisor KVM pada virtual machine di lingkungan Apache CloudStack terhadap performa tugas komputasi seperti kompresi video, enkripsi dan dekripsi AES, dan validasi integritas data dengan CRC32.
+
+      \item Menemukan metodologi konfigurasi hypervisor KVM yang optimal untuk meningkatkan efisiensi atau kecepatan dalam menangani tugas komputasi tertentu pada Apache CloudStack.
+
+\end{enumerate}
+
+Hasil penelitian ini diharapkan tidak hanya memberikan panduan praktis tetapi juga kontribusi akademis dalam bidang optimalisasi infrastruktur cloud.
+
+%-----------------------------------------------------------------------------%
+\section{Metodologi Penelitian}
+%-----------------------------------------------------------------------------%
+Beberapa metodologi yang dilakukan pada penelitian ini, antara lain:
+\begin{enumerate}
+      \item Studi Literatur
+
+            Studi literatur dalam penelitian ini dilakukan dengan melakukan pencarian, membaca, dan memahami jurnal serta sumber referensi yang terkait dengan \cc. Penelitian ini juga melibatkan eksplorasi literatur yang mendalam terkait dengan metode konfigurasi hypervisor KVM, kondisi saat melakukan pemrosesan kompresi video, enkripsi dan dekripsi AES, dan juga mengenai validasi integritas data dengan CRC32 serta evaluasi keuntungan dan kerugian yang mungkin muncul akibat hasil konfigurasi ini.
+
+      \item Pengumpulan Data
+
+            Pada penelitian ini, akan dilakukan tiga pengujian
+            \begin{enumerate}
+                  \item Kompresi Video
+
+                        Kompresi video akan dilakukan menggunakan ffmpeg pada dua sistem, yaitu sistem yang menggunakan KVM default dan sistem yang menggunakan KVM yang sudah dikonfigurasikan. Pada masing-masing sistem, kompresi video akan dilakukan sebanyak 100 kali. Setelah itu, waktu rata-rata kompresi video pada kedua sistem akan dibandingkan dan dianalisis.
+
+                  \item Validasi Integritas Data dengan CRC32
+
+                        Validasi Integritas Data dengan menggunakan fungsi CRC32 akan dilakukan dengan program benchmark yang dibuat \saya\ dengan python pada kedua sistem. Pada masing-masing sistem, validasi CRC32 akan dilakukan sebanyak 100 kali. Setelah itu, waktu rata-rata validasi integritas data dengan CRC32 pada kedua sistem akan dibandingkan dan dianalisis.
+
+                  \item Enkripsi dan Dekripsi AES
+
+                        Enkripsi dan dekripsi AES akan dilakukan dengan program benchmark yang dibuat \saya\ dengan python pada kedua sistem. Pada masing-masing sistem, enkripsi dan dekripsis AES akan dilakukan sebanyak 100 kali. Setelah itu, waktu rata-rata enkripsi dan dekripsi AES pada kedua sistem akan dibandingkan dan dianalisis.
+            \end{enumerate}
+
+      \item Analisis
+
+            Setelah itu, dilakukan evaluasi terhadap hasil yang diperoleh dan kemudian menyusun kesimpulan.
+\end{enumerate}
+
+
+%-----------------------------------------------------------------------------%
+\section{Sistematika Penulisan}
+%-----------------------------------------------------------------------------%
+Pada penulisan skripsi ini terdiri dari 5 bab dengan pokok bahasan yang berbeda-beda untuk setiap bab.
+\begin{itemize}
+      \item BAB I \babSatu
+
+            Bab I membahas tentang pendahuluan penelitian, yang meliputi latar belakang masalah, rumusan masalah, batasan masalah, tujuan penelitian, metode penelitian, dan sistematika penulisan.
+
+      \item BAB II \babDua
+
+            Bab II membahas tentang landasan teori yang digunakan untuk memahami dan menganalisis hasil penelitian.
+
+      \item BAB III \babTiga
+
+            Bab III membahas tentang tahapan dan bagaimana metode yang digunakan untuk melakukan konfigurasi dan pengujian dari konfigurasi parameter Hypervisor KVM, dan juga bagaimana analisis akan dilakukan.
+
+      \item BAB IV \babEmpat
+
+            Bab IV menjelaskan hasil penelitian yang terdiri dari pengujian konfigurasi parameter hypervisor KVM, dan dilakukan analisis performa hypervisor KVM setelah proses konfigurasi.
+
+      \item BAB V \babLima
+
+            Bab V menjelaskan kesimpulan dari penelitian dilakukan dan saran.
+\end{itemize}
